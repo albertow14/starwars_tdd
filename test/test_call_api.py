@@ -45,3 +45,5 @@ class TestCallApi(unittest.TestCase):
         assert expected_result == result
         self.fake_request.get.assert_called_once_with('https://swapi.co/api/planets')
 
+    def test_people_random_return_name_mass_planet(self):
+        assert False
