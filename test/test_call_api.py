@@ -33,6 +33,20 @@ class ApiSwapi():
         planet_data = planet.json()
         return {'name': planet_data.get('name'),
                 'gravity': planet_data.get('gravity')}
+            
+    def orchestator(self):
+        person = self.api_swapi.get_random_character()
+        person_name = person.get('name')
+        homeworld = requests.get(person.get('homeworld'))
+        homeworld_data = homeworld.json()
+        homeworld_name = homeworld_data.get('name')
+        planet_to_visit = self.api_swapi.get_random_planet(person)
+        planet_to_visit_data = planet_to_visit.json()
+        kilos_planet_visited = planet_to_visit_data.get('gravity') * person.get('mass') * 10
+        kilos_homeworld = person.get('mass') * homeworld.get('gravity') * 10
+        f'Luke pesa 7700 kg en su planeta natal y pesa 770 kg en Tierra .'
+        return f'{person_name} pesa {kilos_homeworld} kg en su planeta natal y pesa {kilos_planet_visited} kg en {homeworld_name} .'
+
         
     
 
@@ -42,8 +56,10 @@ def side_effect(value):
     fake_response.json.return_value = {'name':'Luke', 'mass': 77, 'homeworld':'https://swapi.co/api/planets/20/', 'basura':'blablabla'}
     if value == 'https://swapi.co/api/people/' or value == 'https://swapi.co/api/planets/':        
         fake_response.json.return_value = {'count':87}
-    elif 'https://swapi.co/api/planets/' in value:
+    elif 'https://swapi.co/api/planets/1' == value:
         fake_response.json.return_value = {'name':'Naboo', 'gravity': 1}
+    elif 'https://swapi.co/api/planets/' in value:
+        fake_response.json.return_value = {'name':'Tierra', 'gravity': 10}
     return fake_response
 
 
@@ -86,5 +102,9 @@ class TestCallApi(unittest.TestCase):
         assert result == expected_result
 
     def test_weight_in_random_planet(self):
-        expected_result = f'Luke pesa 770 kg en su planeta natal y pesa 770 kg en Naboo .'
-        
+        expected_result = f'Luke pesa 7700 kg en su planeta natal y pesa 770 kg en Naboo .'
+
+        result = self.api_swapi.orchestator()
+
+        assert result == expected_result
+
